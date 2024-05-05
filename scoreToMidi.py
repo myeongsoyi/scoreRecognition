@@ -21,11 +21,16 @@ def word2midi(mid, track, words):
         component_type = word.split('-')
         if component_type[0] == 'note':
             note_type = component_type[1].split('_')
-            track.append(Message('note_on', note=getattr(note.notes,note_type[0]), velocity=velocity, time=float(time_since_last_event)))
-            track.append(Message('note_off', note=getattr(note.notes,note_type[0]), velocity=velocity, time=float(mid.ticks_per_beat*getattr(tick.ticks, note_type[1]))))
+            dur = ''
+            for i in range(len(note_type)):
+                if i==0: pass
+                if i==1: dur = note_type[i]
+                else: dur += '_' + note_type[i]
+            track.append(Message('note_on', note=getattr(note.notes,note_type[0]).value, velocity=velocity, time=int(time_since_last_event)))
+            track.append(Message('note_off', note=getattr(note.notes,note_type[0]).value, velocity=velocity, time=int(mid.ticks_per_beat*getattr(tick.ticks, dur).value)))
             time_since_last_event = 0
         if component_type[0] == 'rest':
-            time_since_last_event += float(getattr(tick.ticks,component_type[1]))
+            time_since_last_event += int(getattr(tick.ticks,component_type[1]).value)
 
     # 패턴에 따라 메시지 추가
     # for i in range(len(pattern)):
